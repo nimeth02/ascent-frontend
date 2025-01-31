@@ -35,7 +35,7 @@ const Course = () => {
   }, []);
 
   const handleEnroll = (courseId) => {
-    console.log(courseId);
+
 
     axiosInstance
       .post("/api/enrollments",{
@@ -44,7 +44,14 @@ const Course = () => {
       .then((res) => {
         console.log("res.status", res.status);
         if (res.status === 201) {
-          toast.success("Successfully Enrolled", {
+          const enrolledCourse = courses.find(course => course.id === courseId);
+
+          if (!enrolledCourse) return; // Ensure course exists before modifying state
+  
+          // Remove from courses and add to enrolledCourses
+          setCourses(prevCourses => prevCourses.filter(course => course.id !== courseId));
+          setEnrolledCourses(prevEnrolledCourses => [...prevEnrolledCourses, enrolledCourse]);
+          toast.success(`Successfully Enrolled ${enrolledCourse.name}`, {
             position: "top-center",
             autoClose: 5000,
             hideProgressBar: false,
@@ -55,6 +62,7 @@ const Course = () => {
             theme: "light",
           });
         }
+
   
       })
       .catch((error) => {
